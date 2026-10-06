@@ -1,169 +1,166 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#eef5ff"><meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="Einbürgerung">
+<html lang="en" data-mode="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5f6f4"><meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="Einbürgerung">
 <title>Einbürgerungstest Trainer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: calm single reading column; compact progress ring + one-line status above, one roomy question sheet below. Pine ink on cool sage paper, soft coral only for errors. */
+/* Layout: quiet single column. Top bar (wordmark | language + mode), progress strip, one question sheet. Hairline borders instead of shadows; one green accent; semantic green/red/amber only for state. */
 :root{
-  /* Cheerful, always-light: airy sky ground, white sheets, bright cobalt accent, sunflower for "to do", fresh green / coral for right / wrong */
-  --bg:#eef5ff; --bg-2:#dde9fb; --surface:#ffffff; --surface-2:#f1f6fe; --fg:#1b2440; --muted:#5f6b85; --line:#d9e3f3;
-  --accent:#2f62f0; --accent-soft:#e3ebff; --accent-fg:#ffffff;
-  --ok:#14a05c; --ok-bg:#e2f7ec; --bad:#ec4c42; --bad-bg:#ffe9e6; --warn:#e89a00; --warn-bg:#fff3d1;
-  --shadow:0 1px 2px rgba(47,98,240,.06),0 10px 30px rgba(47,98,240,.10);
-  --ui:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --read:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --bg:#f5f6f4; --surface:#ffffff; --surface-2:#f0f2ef; --fg:#101513; --muted:#69736d; --line:#e2e6e2;
+  --accent:#0f7a56; --accent-soft:#e3f2ea; --accent-fg:#ffffff;
+  --ok:#11934f; --ok-bg:#e5f5ec; --bad:#d9363e; --bad-bg:#fdecec; --warn:#e39b12;
+  --font:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   color-scheme:light;
 }
+:root[data-mode="dark"]{
+  --bg:#0b0d0c; --surface:#131715; --surface-2:#1a1f1c; --fg:#ecf1ee; --muted:#8e9993; --line:#252c28;
+  --accent:#3ccf94; --accent-soft:#16291f; --accent-fg:#06130d;
+  --ok:#43d17f; --ok-bg:#142a1d; --bad:#ff6b6b; --bad-bg:#2e1517; --warn:#f2b43c;
+  color-scheme:dark;
+}
 *{box-sizing:border-box}
-html{color-scheme:light}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--font);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
 img{max-width:100%}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--ui);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
-.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:20px 56px;display:grid;gap:18px}
+button{font-family:inherit}
+.wrap{max-width:680px;margin:0 auto;padding-inline:16px;padding-block:14px 56px;display:grid;gap:16px}
 
-/* top */
-.top{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
-.ring{width:68px;height:68px;position:relative}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-weight:600;font-size:15px;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;min-width:0}
+.brand i{width:9px;height:9px;border-radius:3px;background:var(--accent);flex:none}
+.ctrls{display:flex;gap:6px;align-items:center}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--surface)}
+.seg button{border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.03em;padding:5px 9px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.icon{width:32px;height:32px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);display:grid;place-items:center;cursor:pointer}
+.icon svg{width:16px;height:16px}
+
+.prog{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.ring{width:52px;height:52px;position:relative}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.ring .track{fill:none;stroke:var(--line);stroke-width:7}
-.ring .val{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
-.ring b{position:absolute;inset:0;display:grid;place-items:center;font:700 15px var(--ui)}
-.ttl{min-width:0;display:grid;gap:4px}
-h1{font:600 19px/1.2 var(--read);margin:0;letter-spacing:-.005em}
-.line{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted)}
-.line b{color:var(--fg);font-weight:600}
-.sync{font-size:12.5px;color:var(--bad);background:var(--bad-bg);padding:8px 10px;border-radius:8px;display:block}
+.ring .track{fill:none;stroke:var(--surface-2);stroke-width:6}
+.ring .val{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:12.5px;font-weight:600}
+.nums{display:flex;gap:22px;flex-wrap:wrap}
+.num b{display:block;font-size:20px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.num>span{font-size:12px;color:var(--muted)}
 
-.tabs{display:flex;gap:4px;background:var(--bg-2);padding:4px;border-radius:12px;flex-wrap:wrap}
-.tab{flex:1 1 auto;font:600 13.5px var(--ui);padding:9px 12px;border-radius:9px;border:0;background:transparent;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}
-.tab:hover{color:var(--fg)}
-.tab[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.tab .cnt{font-weight:500;margin-left:5px;font-size:12px;opacity:.7}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tab{flex:1 0 auto;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:13.5px;font-weight:500;padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.tab .cnt{margin-left:6px;font-size:12px;opacity:.8}
+.tab[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 
-/* question sheet */
-.card{background:var(--surface);border-radius:18px;padding:26px 26px 22px;display:grid;gap:20px;box-shadow:var(--shadow)}
-.card.enter{animation:enter .28s ease both}
-@keyframes enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--muted)}
-.chip{font:600 11.5px var(--ui);padding:3px 9px;border-radius:99px;background:var(--surface-2);color:var(--fg);letter-spacing:.02em}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:24px;display:grid;gap:20px}
+.card.enter{animation:enter .25s ease both}
+@keyframes enter{from{opacity:.001;transform:translateY(5px)}to{opacity:1;transform:none}}
+.meta{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}
+.chip{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--surface-2);color:var(--fg)}
 .chip.land{background:var(--accent-soft);color:var(--accent)}
-.dots{display:inline-flex;gap:3px;align-items:center;margin-left:auto}
-.dots i{width:8px;height:8px;border-radius:50%;background:var(--warn-bg);box-shadow:inset 0 0 0 1.5px var(--warn)}
-.dots span{font-size:12px;color:var(--warn);font-weight:600;margin-left:4px}
-.qtext{font:600 22px/1.42 var(--read);margin:0;text-wrap:pretty;letter-spacing:-.005em}
-.qen{font:400 14.5px/1.5 var(--read);font-style:italic;color:var(--muted);margin:-10px 0 0}
-.fig{background:#fff;border-radius:12px;padding:12px;display:grid;justify-items:center;gap:4px;border:1px solid var(--line)}
+.dots{display:inline-flex;gap:4px;align-items:center;margin-left:auto}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--warn)}
+.dots span{font-size:12px;font-weight:600;color:var(--muted);margin-left:4px}
+.qtext{font-size:20.5px;line-height:1.42;font-weight:600;letter-spacing:-.015em;margin:0;text-wrap:pretty}
+.qen{font-size:14px;color:var(--muted);margin:-12px 0 0}
+.fig{background:#fff;border-radius:14px;padding:12px;display:grid;justify-items:center;gap:4px;border:1px solid var(--line)}
 .fig img{max-height:380px;width:auto;object-fit:contain}
-.fig small{color:#5d6b65;font-size:11px}
-.answers{display:grid;gap:10px;margin:0;padding:0;list-style:none}
-.ans{width:100%;text-align:left;display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;font:500 16px/1.45 var(--ui);color:var(--fg);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;transition:border-color .12s,background .12s,transform .08s}
-.ans:hover:not(:disabled){border-color:var(--accent);background:var(--surface-2)}
-.ans:active:not(:disabled){transform:scale(.995)}
-.ans:focus-visible,.tab:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.ans .k{font:600 12.5px var(--ui);width:28px;height:28px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center;color:var(--muted)}
-.ans .en{display:block;font-size:13px;color:var(--muted);font-weight:400;margin-top:2px}
+.fig small{color:#69736d;font-size:11px}
+.answers{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.ans{width:100%;text-align:left;display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:start;font-size:16px;line-height:1.45;font-weight:450;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px;cursor:pointer;transition:border-color .12s,background .12s}
+.ans:hover:not(:disabled){border-color:var(--fg)}
+.ans .k{font-size:12px;font-weight:600;width:26px;height:26px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center;color:var(--muted)}
+.ans .en{display:block;font-size:13px;color:var(--muted);margin-top:2px}
 .ans.right{border-color:var(--ok);background:var(--ok-bg)}
 .ans.right .k{background:var(--ok);color:var(--surface)}
 .ans.wrong{border-color:var(--bad);background:var(--bad-bg)}
 .ans.wrong .k{background:var(--bad);color:var(--surface)}
-.ans.dim{opacity:.55}
+.ans.dim{opacity:.45}
 .ans:disabled{cursor:default}
-.feedback{border-radius:12px;padding:14px 16px;display:grid;gap:6px;font-size:14.5px;animation:enter .2s ease both}
-.feedback.ok{background:var(--ok-bg)} .feedback.bad{background:var(--bad-bg)}
-.feedback strong{font-size:15px;color:var(--ok)} .feedback.bad strong{color:var(--bad)}
-.feedback .ex{font:400 15px/1.55 var(--read)}
-.feedback .src{font-size:11px;color:var(--muted)}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-.btn{font:600 14.5px var(--ui);padding:11px 20px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-fg);cursor:pointer}
-.btn.ghost{background:transparent;color:var(--accent)}
-.btn.danger{border-color:var(--bad);color:var(--bad);background:transparent}
-.hint{font-size:12px;color:var(--muted)}
-.opts{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);padding-inline:4px}
-.opts label{display:flex;gap:6px;align-items:center;cursor:pointer}
-.opts input{accent-color:var(--accent)}
-details{background:var(--surface);border-radius:14px;padding:14px 18px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fb{display:grid;gap:6px;padding:14px 16px;border-radius:14px;font-size:15px}
+.fb.ok{background:var(--ok-bg)} .fb.bad{background:var(--bad-bg)}
+.fb strong{font-weight:600;color:var(--ok)} .fb.bad strong{color:var(--bad)}
+.foot{display:flex;justify-content:flex-end}
+.btn{font-size:15px;font-weight:600;padding:12px 22px;border-radius:999px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-fg);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn.danger{background:transparent;color:var(--bad);border-color:var(--bad)}
+.empty{text-align:center;padding:24px 8px;display:grid;gap:12px;justify-items:center}
+.result{font-size:40px;font-weight:600;letter-spacing:-.03em;margin:0}
+.hint{font-size:13px;color:var(--muted)}
+details{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 18px}
 summary{cursor:pointer;font-weight:600;font-size:14px}
-details p{color:var(--muted);font-size:14px}
+.opts{display:grid;gap:10px;margin-block:14px;font-size:14px}
+.opts label{display:flex;gap:10px;align-items:center;cursor:pointer}
+.opts input{accent-color:var(--accent);width:18px;height:18px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13.5px}
+.actions .btn{font-size:13.5px;padding:9px 16px}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
-td,th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
-td.num{white-space:nowrap;text-align:right}
-.tblwrap{overflow-x:auto;margin-top:10px}
-.empty{text-align:center;padding:30px 12px;display:grid;gap:12px;justify-items:center}
-.result{font:600 38px var(--read);margin:0}
-.confirm{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);font:600 13px var(--ui);padding:9px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .25s}
+td,th{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+td.n{white-space:nowrap;text-align:right}
+.tbl{overflow-x:auto;margin-top:10px}
+.warnbox{font-size:13px;color:var(--bad);background:var(--bad-bg);padding:10px 12px;border-radius:12px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);font-size:13px;font-weight:600;padding:9px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .25s}
 .toast.show{opacity:1}
-@media (max-width:540px){
-  .card{padding:20px 18px 18px;border-radius:16px}
-  .qtext{font-size:19.5px}
+@media (max-width:520px){
+  .card{padding:20px 16px;border-radius:20px}
+  .qtext{font-size:18.5px}
   .ans{font-size:15.5px;padding:12px}
-  #next{width:100%}
-  .row .hint.kbd{display:none}
+  .foot .btn{width:100%}
+  .nums{gap:16px}
 }
-@media (prefers-reduced-motion:reduce){.card.enter,.feedback{animation:none}.ring .val,.ans,.tab{transition:none}}
-
-/* cheerful accents */
-body{background:radial-gradient(1200px 500px at 85% -10%,#fff2c9 0%,transparent 60%),radial-gradient(900px 500px at -10% 0%,#dff7ec 0%,transparent 55%),var(--bg);background-attachment:fixed}
-.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);box-shadow:0 2px 8px rgba(47,98,240,.3)}
-.ring .val{stroke:url(#ringgrad)}
-.ring .track{stroke:#dde6f6}
-.qtext{font-weight:800;letter-spacing:-.01em}
-h1{font-weight:800}
-.ans{border-radius:14px}
-.ans .k{background:var(--accent-soft);color:var(--accent);border-radius:9px}
-.ans:hover:not(:disabled){background:var(--accent-soft)}
-.dots i{background:var(--warn);box-shadow:none}
-.chip{background:var(--accent-soft);color:var(--accent)}
-.chip.land{background:#fff3d1;color:#9a6400}
-.btn{border-radius:12px;box-shadow:0 3px 10px rgba(47,98,240,.25)}
-.btn.ghost,.btn.danger{box-shadow:none}
-.feedback{border-radius:14px}
-.feedback .ex{font-family:var(--ui)}
-.tabs{background:#ffffffaa}
+@media (prefers-reduced-motion:reduce){.card.enter{animation:none}.ring .val,.ans,body{transition:none}}
 </style>
-
 </head><body>
+
 <div class="wrap">
-  <div class="top">
-    <div class="ring" aria-label="Preguntas dominadas">
-      <svg viewBox="0 0 80 80" aria-hidden="true"><defs><linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f62f0"/><stop offset="1" stop-color="#14a05c"/></linearGradient></defs><circle class="track" cx="40" cy="40" r="34"/><circle class="val" id="ringval" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
+  <div class="bar">
+    <div class="brand"><i></i>Einbürgerungstest</div>
+    <div class="ctrls">
+      <div class="seg" role="group" id="langs">
+        <button data-lang="en">EN</button><button data-lang="es">ES</button><button data-lang="ro">RO</button>
+      </div>
+      <button class="icon" id="mode" type="button"></button>
+    </div>
+  </div>
+
+  <div class="warnbox" id="warn" hidden></div>
+
+  <section class="prog">
+    <div class="ring">
+      <svg viewBox="0 0 80 80" aria-hidden="true"><circle class="track" cx="40" cy="40" r="34"/><circle class="val" id="ringval" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
       <b id="ringpct">0%</b>
     </div>
-    <div class="ttl">
-      <h1>Einbürgerungstest Trainer</h1>
-      <div class="line">
-        <span><b id="s-done">0</b>/310</span>
-        <span>Hoy <b id="s-session">0/0</b></span>
-      </div>
-      <span class="sync" id="sync" hidden></span>
+    <div class="nums">
+      <div class="num"><b><span id="s-done">0</span><small style="font-size:13px;color:var(--muted);font-weight:500">/310</small></b><span data-t="mastered"></span></div>
+      <div class="num"><b id="s-today">0/0</b><span data-t="today"></span></div>
     </div>
+  </section>
+
+  <div class="tabs" role="group">
+    <button class="tab" id="tab-learn" aria-pressed="true"><span data-t="practice"></span><span class="cnt" id="cnt-learn"></span></button>
+    <button class="tab" id="tab-errors" aria-pressed="false"><span data-t="mistakes"></span><span class="cnt" id="cnt-errors"></span></button>
+    <button class="tab" id="tab-test" aria-pressed="false"><span data-t="mock"></span></button>
   </div>
 
-  <div class="tabs" role="group" aria-label="Modo">
-    <button class="tab" id="tab-learn" aria-pressed="true">Práctica<span class="cnt" id="cnt-learn"></span></button>
-    <button class="tab" id="tab-errors" aria-pressed="false">Mis errores<span class="cnt" id="cnt-errors"></span></button>
-    <button class="tab" id="tab-test" aria-pressed="false">Simulacro 33</button>
-  </div>
+  <main class="card" id="card" aria-live="polite"><div class="empty"><p class="hint">…</p></div></main>
 
-  <main class="card" id="card" aria-live="polite">
-    <div class="empty"><p>Cargando preguntas…</p></div>
-  </main>
-
-  <details id="errs">
-    <summary>Más falladas</summary>
-    <div class="tblwrap"><table><thead><tr><th>Nr.</th><th>Pregunta</th><th class="num">Errores</th></tr></thead><tbody id="errtbody"></tbody></table></div>
+  <details>
+    <summary data-t="mostMissed"></summary>
+    <div class="tbl"><table><thead><tr><th data-t="no"></th><th data-t="question"></th><th class="n" data-t="errors"></th></tr></thead><tbody id="errtbody"></tbody></table></div>
   </details>
 
   <details>
-    <summary>Ajustes</summary>
-    <div class="opts" style="margin-block:12px">
-      <label><input type="checkbox" id="opt-shuffle" checked> Mezclar respuestas</label>
-      <label><input type="checkbox" id="opt-en"> Traducción EN</label>
+    <summary data-t="settings"></summary>
+    <div class="opts">
+      <label><input type="checkbox" id="opt-shuffle"><span data-t="shuffle"></span></label>
+      <label><input type="checkbox" id="opt-en"><span data-t="showEn"></span></label>
     </div>
-    <div class="confirm" style="margin-bottom:10px"><button class="btn ghost" id="exp">Exportar progreso</button><label class="btn ghost" for="imp">Importar progreso</label><input type="file" id="imp" accept=".json,application/json" hidden></div>
-    <div class="confirm" id="reset-area"><button class="btn danger" id="reset">Borrar mi progreso</button></div>
+    <div class="actions" id="io" hidden style="margin-bottom:10px">
+      <button class="btn ghost" id="exp" data-t="export"></button>
+      <label class="btn ghost" for="imp" data-t="import"></label><input type="file" id="imp" accept=".json,application/json" hidden>
+    </div>
+    <div class="actions" id="reset-area"></div>
   </details>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -173,14 +170,25 @@ h1{font-weight:800}
 (function(){
 "use strict";
 const NEED0=3, PENALTY=2, LS_KEY="ebt-progress-v1";
-let Q=[], byId={}, state=null, mode="learn", cur=null, answered=false, recent=[], session={ok:0,n:0,streak:0,start:Date.now()};
-let test=null;
-let docRef=null, saveTimer=null;
+const IN_CLAUDE=!!(window.claude&&window.claude.use);
+
+const T={
+ en:{mastered:"mastered",today:"today",practice:"Practice",mistakes:"My mistakes",mock:"Mock test",mostMissed:"Most missed",no:"No.",question:"Question",errors:"Mistakes",none:"None yet.",settings:"Settings",shuffle:"Shuffle answers",showEn:"Show English translation",export:"Export progress",import:"Import progress",reset:"Reset my progress",resetQ:"Delete all progress and mistakes? This can't be undone.",resetYes:"Yes, delete",cancel:"Cancel",correct:"Correct",mastered1:"Correct · mastered",wrong:"Wrong",next:"Next",seeResult:"See result",mockN:"Mock {i}/33",noMist:"No mistakes left",noMistH:"Every question you missed has its correct answers. Keep going in Practice.",goPractice:"Go to Practice",allDone:"310/310 mastered",allDoneH:"Take a mock test, or reset your progress for another round.",passed:"Passed",failed:"Not passed",min17:"17 correct needed",missed:"Missed",again:"Another mock test",back:"Back to Practice",streak:"{n} in a row",exported:"Progress exported",imported:"Progress imported",badFile:"That file isn't a progress export",toGo:"{n} correct answers to go",dark:"Switch to dark mode",light:"Switch to light mode",noStore:"This browser can't save progress for a file opened directly on the phone. Open the app from its web link, or use Settings → Export progress before closing.",noSync:"Couldn't save to your account. Progress is kept in this browser only."},
+ es:{mastered:"dominadas",today:"hoy",practice:"Práctica",mistakes:"Mis errores",mock:"Simulacro",mostMissed:"Más falladas",no:"Nr.",question:"Pregunta",errors:"Errores",none:"Ninguna todavía.",settings:"Ajustes",shuffle:"Mezclar respuestas",showEn:"Mostrar traducción al inglés",export:"Exportar progreso",import:"Importar progreso",reset:"Borrar mi progreso",resetQ:"¿Borrar todo el progreso y los errores? No se puede deshacer.",resetYes:"Sí, borrar",cancel:"Cancelar",correct:"Correcto",mastered1:"Correcto · dominada",wrong:"Incorrecto",next:"Siguiente",seeResult:"Ver resultado",mockN:"Simulacro {i}/33",noMist:"Sin errores pendientes",noMistH:"Todas las preguntas que fallaste ya tienen sus aciertos. Seguí en Práctica.",goPractice:"Ir a Práctica",allDone:"310/310 dominadas",allDoneH:"Hacé un simulacro o borrá el progreso para otra vuelta.",passed:"Aprobado",failed:"No aprobado",min17:"Se necesitan 17 correctas",missed:"Falladas",again:"Otro simulacro",back:"Volver a Práctica",streak:"{n} seguidas",exported:"Progreso exportado",imported:"Progreso importado",badFile:"Ese archivo no es un progreso exportado",toGo:"Faltan {n} aciertos",dark:"Cambiar a modo noche",light:"Cambiar a modo día",noStore:"Este navegador no puede guardar el progreso de un archivo abierto directo en el celular. Abrí la app desde su link web, o usá Ajustes → Exportar progreso antes de cerrar.",noSync:"No se pudo guardar en tu cuenta. El progreso queda solo en este navegador."},
+ ro:{mastered:"stăpânite",today:"azi",practice:"Exersare",mistakes:"Greșelile mele",mock:"Test simulat",mostMissed:"Cele mai greșite",no:"Nr.",question:"Întrebare",errors:"Greșeli",none:"Niciuna încă.",settings:"Setări",shuffle:"Amestecă răspunsurile",showEn:"Arată traducerea în engleză",export:"Exportă progresul",import:"Importă progresul",reset:"Șterge progresul meu",resetQ:"Ștergi tot progresul și toate greșelile? Nu se poate anula.",resetYes:"Da, șterge",cancel:"Anulează",correct:"Corect",mastered1:"Corect · stăpânită",wrong:"Greșit",next:"Următoarea",seeResult:"Vezi rezultatul",mockN:"Simulare {i}/33",noMist:"Nicio greșeală rămasă",noMistH:"Toate întrebările greșite au acum răspunsurile corecte necesare. Continuă la Exersare.",goPractice:"Mergi la Exersare",allDone:"310/310 stăpânite",allDoneH:"Fă un test simulat sau șterge progresul pentru încă o rundă.",passed:"Promovat",failed:"Nepromovat",min17:"Sunt necesare 17 răspunsuri corecte",missed:"Greșite",again:"Încă un test simulat",back:"Înapoi la Exersare",streak:"{n} la rând",exported:"Progres exportat",imported:"Progres importat",badFile:"Fișierul nu este un progres exportat",toGo:"Mai sunt necesare {n} răspunsuri corecte",dark:"Treci la modul de noapte",light:"Treci la modul de zi",noStore:"Acest browser nu poate salva progresul unui fișier deschis direct pe telefon. Deschide aplicația din linkul web sau folosește Setări → Exportă progresul înainte de a închide.",noSync:"Nu s-a putut salva în cont. Progresul rămâne doar în acest browser."}
+};
+
+let Q=[], byId={}, state=null, mode="learn", view="q", cur=null, order=[0,1,2,3], picked=null, recent=[], streak=0, test=null, result=null;
+let docRef=null, saveTimer=null, warnKey=null, resetAsk=false, animateNext=true;
 
 /* ---------- pure logic ---------- */
-function blank(){return {v:1,updatedAt:0,q:{},settings:{shuffle:true,en:false}}}
-function rec(id){return state.q[id]||(state.q[id]={need:NEED0,ok:0,bad:0})}
+function blank(){return {v:1,updatedAt:0,q:{},settings:{}}}
+function ensureSettings(){
+  const nav=(navigator.language||"en").slice(0,2);
+  state.settings=Object.assign({shuffle:true,en:false,lang:T[nav]?nav:"en",mode:"light"},state.settings||{});
+}
 function today(){const d=new Date().toLocaleDateString("sv"); if(!state.day||state.day.d!==d) state.day={d,ok:0,n:0}; return state.day}
+function rec(id){return state.q[id]||(state.q[id]={need:NEED0,ok:0,bad:0})}
 function needOf(id){const r=state.q[id];return r?r.need:NEED0}
 function applyAnswer(id,correct){
   const r=rec(id);
@@ -191,189 +199,191 @@ function pool(m){return Q.filter(q=>needOf(q.id)>0&&(m!=="errors"||(state.q[q.id
 function pick(list){
   if(!list.length) return null;
   const avoid=new Set(recent.slice(-Math.min(6,list.length-1)));
-  const cand=list.filter(q=>!avoid.has(q.id));
-  const src=cand.length?cand:list;
+  const cand=list.filter(q=>!avoid.has(q.id)), src=cand.length?cand:list;
   let tot=0; for(const q of src) tot+=needOf(q.id);
   let r=Math.random()*tot;
   for(const q of src){r-=needOf(q.id); if(r<=0) return q}
   return src[src.length-1];
 }
 function shuffled(n){const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function sample(arr,k){return shuffled(arr.length).slice(0,k).map(i=>arr[i])}
-window.__ebt={applyAnswer,pool,pick,blank,_set:s=>{state=s}};
 
 /* ---------- persistence ---------- */
 function loadLocal(){try{const s=JSON.parse(localStorage.getItem(LS_KEY)||"null");return s&&s.q?s:null}catch(e){return null}}
 function saveLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify(state))}catch(e){}}
-/* only problems are shown; a working sync stays silent */
-function setSync(t){const el=document.getElementById("sync"); const bad=t.startsWith("No se "); el.textContent=t; el.hidden=!bad}
-function persist(){
-  saveLocal();
-  if(!docRef) return;
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(flush,1200);
-}
+function persist(){saveLocal(); if(!docRef) return; clearTimeout(saveTimer); saveTimer=setTimeout(flush,1200)}
 async function flush(){
-  clearTimeout(saveTimer); saveTimer=null;
-  if(!docRef) return;
-  try{await docRef.set({state:JSON.stringify(state)}); setSync("Guardado en tu cuenta ✓")}
-  catch(e){setSync("No se pudo guardar en tu cuenta: queda guardado solo en este navegador")}
+  clearTimeout(saveTimer); saveTimer=null; if(!docRef) return;
+  try{await docRef.set({state:JSON.stringify(state)}); setWarn(null)}catch(e){setWarn("noSync")}
 }
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&saveTimer) flush()});
-async function connectDb(){}
-function ensureSettings(){state.settings=Object.assign({shuffle:true,en:false},state.settings||{})}
+async function connectDb(){
+  if(!IN_CLAUDE) return;
+  try{
+    const [d,u]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
+    if(!d||!u) return;
+    const id=await u.id(); if(!id) return;
+    docRef=d.collection("data/users/"+id).doc("progress");
+    const snap=await docRef.get();
+    let remote=null;
+    if(snap.exists){try{remote=JSON.parse(snap.data().state)}catch(e){}}
+    if(remote&&remote.q&&(remote.updatedAt||0)>=(state.updatedAt||0)){state=remote; ensureSettings(); saveLocal(); applyChrome(); renderStats(); if(view!=="q"||picked===null){nextQuestion()}}
+    else if(state.updatedAt>0){await flush()}
+  }catch(e){}
+}
 
-/* ---------- rendering ---------- */
+/* ---------- helpers ---------- */
 const $=id=>document.getElementById(id);
+const L=()=>T[state.settings.lang]||T.en;
+function t(k,v){let s=L()[k]||T.en[k]||k; if(v) for(const x in v) s=s.replace("{"+x+"}",v[x]); return s}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 function label(q){return q.land?"Berlin "+q.n:"Aufgabe "+q.n}
-function dots(n){const shown=Math.min(n,7);return `<span class="dots" title="Faltan ${n} aciertos">${"<i></i>".repeat(shown)}<span>${n}</span></span>`}
+function imgSrc(q){return q.img.startsWith("data:")?q.img:"img/"+q.img}
+function dots(n){return `<span class="dots" title="${esc(t("toGo",{n}))}">${"<i></i>".repeat(Math.min(n,7))}<span>${n}</span></span>`}
 let toastT=null;
-function toast(t){const el=$("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),1800)}
+function toast(s){const el=$("toast"); el.textContent=s; el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),1800)}
+function setWarn(k){warnKey=k; const w=$("warn"); w.hidden=!k; if(k) w.textContent=t(k)}
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
 
+/* ---------- rendering ---------- */
+function applyChrome(){
+  const s=state.settings, dark=s.mode==="dark";
+  document.documentElement.setAttribute("data-mode",dark?"dark":"light");
+  document.documentElement.lang=s.lang;
+  $("mode").innerHTML=dark?SUN:MOON; $("mode").setAttribute("aria-label",t(dark?"light":"dark")); $("mode").title=t(dark?"light":"dark");
+  document.querySelectorAll("#langs button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===s.lang)));
+  document.querySelectorAll("[data-t]").forEach(el=>el.textContent=t(el.dataset.t));
+  $("opt-shuffle").checked=s.shuffle; $("opt-en").checked=s.en;
+  $("io").hidden=IN_CLAUDE;
+  if(warnKey) setWarn(warnKey);
+  renderReset();
+}
+function renderReset(){
+  const a=$("reset-area");
+  if(resetAsk){
+    a.innerHTML=`<span>${esc(t("resetQ"))}</span><button class="btn danger" id="reset-yes">${esc(t("resetYes"))}</button><button class="btn ghost" id="reset-no">${esc(t("cancel"))}</button>`;
+    $("reset-no").onclick=()=>{resetAsk=false; renderReset()};
+    $("reset-yes").onclick=()=>{const s=state.settings; state=blank(); state.settings=s; state.updatedAt=Date.now(); recent=[]; streak=0; resetAsk=false; persist(); renderReset(); setMode("learn"); renderStats()};
+  } else {
+    a.innerHTML=`<button class="btn danger" id="reset">${esc(t("reset"))}</button>`;
+    $("reset").onclick=()=>{resetAsk=true; renderReset()};
+  }
+}
 function renderStats(){
-  let done=0;
-  for(const q of Q){if(needOf(q.id)===0) done++}
-  const pct=Q.length?done/Q.length:0;
-  $("s-done").textContent=done;
-  {const t=today(); $("s-session").textContent=t.ok+"/"+t.n}
+  let done=0; for(const q of Q) if(needOf(q.id)===0) done++;
+  const pct=Q.length?done/Q.length:0, d=today();
+  $("s-done").textContent=done; $("s-today").textContent=d.ok+"/"+d.n;
   $("ringpct").textContent=Math.round(pct*100)+"%";
   $("ringval").style.strokeDashoffset=(213.6*(1-pct)).toFixed(1);
   $("cnt-learn").textContent=pool("learn").length;
   $("cnt-errors").textContent=pool("errors").length;
   const rows=Q.filter(q=>state.q[q.id]&&state.q[q.id].bad>0).sort((a,b)=>state.q[b.id].bad-state.q[a.id].bad||needOf(b.id)-needOf(a.id)).slice(0,40);
-  $("errtbody").innerHTML=rows.length?rows.map(q=>`<tr><td class="num">${esc(label(q))}</td><td>${esc(q.q)}<br><span class="hint">✔ ${esc(q.a[q.c])}</span></td><td class="num">${state.q[q.id].bad}</td></tr>`).join(""):`<tr><td colspan="3" class="hint">Ninguna todavía.</td></tr>`;
+  $("errtbody").innerHTML=rows.length?rows.map(q=>`<tr><td class="n">${esc(label(q))}</td><td>${esc(q.q)}<br><span class="hint">✔ ${esc(q.a[q.c])}</span></td><td class="n">${state.q[q.id].bad}</td></tr>`).join(""):`<tr><td colspan="3" class="hint">${esc(t("none"))}</td></tr>`;
 }
-
-function animateCard(){const c=$("card"); c.classList.remove("enter"); void c.offsetWidth; c.classList.add("enter")}
-
-function renderQuestion(){
-  const card=$("card"); answered=false;
-  if(!cur){
-    if(mode==="errors") card.innerHTML=`<div class="empty"><p class="result">Sin errores pendientes</p><p class="hint">Todas las preguntas que fallaste ya tienen sus aciertos. Seguí en Práctica.</p><button class="btn" id="go-learn">Ir a Práctica</button></div>`;
-    else card.innerHTML=`<div class="empty"><p class="result">310 / 310 dominadas</p><p class="hint">Hacé un simulacro de 33 preguntas o borrá el progreso para empezar otra vuelta.</p><button class="btn" id="go-test">Simulacro 33</button></div>`;
-    const gl=$("go-learn"), gt=$("go-test"); if(gl) gl.onclick=()=>setMode("learn"); if(gt) gt.onclick=()=>setMode("test");
-    animateCard(); return;
+function render(){
+  const card=$("card");
+  if(view==="empty"){
+    card.innerHTML=mode==="errors"
+      ?`<div class="empty"><p class="result">${esc(t("noMist"))}</p><p class="hint">${esc(t("noMistH"))}</p><button class="btn" id="go">${esc(t("goPractice"))}</button></div>`
+      :`<div class="empty"><p class="result">${esc(t("allDone"))}</p><p class="hint">${esc(t("allDoneH"))}</p><button class="btn" id="go">${esc(t("mock"))}</button></div>`;
+    $("go").onclick=()=>setMode(mode==="errors"?"learn":"test");
+  } else if(view==="result"){
+    const r=result, pass=r.ok>=17, wrong=r.log.filter(l=>!l.ok).map(l=>byId[l.id]);
+    card.innerHTML=`<div class="empty"><p class="result" style="color:var(${pass?"--ok":"--bad"})">${r.ok} / 33</p><p>${esc(t(pass?"passed":"failed"))} · <span class="hint">${esc(t("min17"))}</span></p>
+      ${wrong.length?`<div class="tbl" style="width:100%;text-align:left"><table><thead><tr><th>${esc(t("no"))}</th><th>${esc(t("missed"))}</th></tr></thead><tbody>${wrong.map(q=>`<tr><td class="n">${esc(label(q))}</td><td>${esc(q.q)}<br><span class="hint">✔ ${esc(q.a[q.c])}</span></td></tr>`).join("")}</tbody></table></div>`:""}
+      <div class="actions" style="justify-content:center"><button class="btn" id="again">${esc(t("again"))}</button><button class="btn ghost" id="back">${esc(t("back"))}</button></div></div>`;
+    $("again").onclick=()=>setMode("test"); $("back").onclick=()=>setMode("learn");
+  } else {
+    const q=cur, en=state.settings.en, done=picked!==null, ok=done&&picked===q.c;
+    const need=needOf(q.id), last=test&&test.i===32;
+    card.innerHTML=`
+      <div class="meta">${test?`<span class="chip">${esc(t("mockN",{i:test.i+1}))}</span>`:""}<span class="chip ${q.land?"land":""}">${esc(label(q))}</span>${dots(need)}</div>
+      <p class="qtext">${esc(q.q)}</p>
+      ${en?`<p class="qen">${esc(q.en.q)}</p>`:""}
+      ${q.img?`<div class="fig"><img src="${imgSrc(q)}" alt="${esc(label(q))}">${q.imgNote?`<small>${esc(q.imgNote)}</small>`:""}</div>`:""}
+      <ol class="answers">${order.map((ai,k)=>{
+        const cls=!done?"":ai===q.c?"right":ai===picked?"wrong":"dim";
+        return `<li><button class="ans ${cls}" data-ai="${ai}" id="ans-${k}" ${done?"disabled":""}><span class="k">${k+1}</span><span>${esc(q.a[ai])}${en?`<span class="en">${esc(q.en.a[ai])}</span>`:""}</span></button></li>`}).join("")}</ol>
+      ${done?`<div class="fb ${ok?"ok":"bad"}"><strong>${esc(t(ok?(need===0?"mastered1":"correct"):"wrong"))}</strong>${q.x?`<span>${esc(q.x)}</span>`:""}</div>
+      <div class="foot"><button class="btn" id="next">${esc(t(last?"seeResult":"next"))}</button></div>`:""}`;
+    if(!done) card.querySelectorAll(".ans").forEach(b=>b.onclick=()=>answer(+b.dataset.ai));
+    else {$("next").onclick=next; $("next").focus({preventScroll:true})}
   }
-  const q=cur, en=state.settings.en, order=state.settings.shuffle?shuffled(4):[0,1,2,3];
-  const r=state.q[q.id];
-  const testInfo=test?`<span class="chip">Simulacro ${test.i+1}/33</span>`:"";
-  card.innerHTML=`
-    <div class="meta">${testInfo}<span class="chip ${q.land?"land":""}">${esc(label(q))}</span>${dots(needOf(q.id))}</div>
-    <p class="qtext">${esc(q.q)}</p>
-    ${en?`<p class="qen">${esc(q.en.q)}</p>`:""}
-    ${q.img?`<div class="fig"><img src="${q.img}" alt="Abbildung zu ${esc(label(q))}">${q.imgNote?`<small>${esc(q.imgNote)}</small>`:""}</div>`:""}
-    <ol class="answers">${order.map((ai,k)=>`<li><button class="ans" data-ai="${ai}" id="ans-${k}"><span class="k">${k+1}</span><span>${esc(q.a[ai])}${en?`<span class="en">${esc(q.en.a[ai])}</span>`:""}</span></button></li>`).join("")}</ol>
-    <div id="fb"></div>`;
-  card.querySelectorAll(".ans").forEach(b=>b.onclick=()=>answer(+b.dataset.ai));
-  animateCard();
+  if(animateNext){card.classList.remove("enter"); void card.offsetWidth; card.classList.add("enter")}
+  animateNext=false;
 }
 
+/* ---------- flow ---------- */
+function showQuestion(q){cur=q; picked=null; order=state.settings.shuffle?shuffled(4):[0,1,2,3]; view=q?"q":"empty"; animateNext=true; render()}
+function nextQuestion(){showQuestion(pick(pool(mode)))}
 function answer(ai){
-  if(answered||!cur) return; answered=true;
-  const q=cur, ok=ai===q.c;
-  applyAnswer(q.id,ok); {const t=today(); t.n++; if(ok) t.ok++} session.n++; if(ok){session.ok++; session.streak++} else session.streak=0;
+  if(picked!==null||!cur) return;
+  const q=cur, ok=ai===q.c; picked=ai;
+  applyAnswer(q.id,ok); const d=today(); d.n++; if(ok) d.ok++;
+  streak=ok?streak+1:0;
   if(test){test.ok+=ok?1:0; test.log.push({id:q.id,ok})}
   recent.push(q.id); if(recent.length>20) recent.shift();
-  document.querySelectorAll(".ans").forEach(b=>{b.disabled=true;const x=+b.dataset.ai; if(x===q.c) b.classList.add("right"); else if(x===ai) b.classList.add("wrong"); else b.classList.add("dim")});
-  const need=needOf(q.id), en=state.settings.en;
-  const old=document.querySelector(".dots"); if(old) old.outerHTML=dots(need);
-  const msg=ok?(need===0?"Correcto · dominada":"Correcto"):"Incorrecto";
-  const last=test&&test.i===32;
-  $("fb").innerHTML=`<div class="feedback ${ok?"ok":"bad"}"><strong>${msg}</strong>
-    ${q.x?`<span class="ex">${esc(en&&q.en.x?q.en.x:q.x)}</span>`:""}</div>
-    <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn" id="next">${last?"Ver resultado":"Siguiente"}</button></div>`;
-  $("next").onclick=next; $("next").focus({preventScroll:true});
-  if(ok&&session.streak>0&&session.streak%10===0) toast(session.streak+" seguidas");
-  persist(); renderStats();
+  render(); persist(); renderStats();
+  if(ok&&streak>0&&streak%10===0) toast(t("streak",{n:streak}));
 }
-
 function next(){
   if(test){
     test.i++;
-    if(test.i>=33){showTestResult();return}
-    cur=byId[test.ids[test.i]];
-  } else cur=pick(pool(mode));
-  renderQuestion();
+    if(test.i>=33){result=test; test=null; cur=null; view="result"; animateNext=true; render(); return}
+    showQuestion(byId[test.ids[test.i]]);
+  } else nextQuestion();
   const top=$("card").getBoundingClientRect().top;
   if(top<0) window.scrollTo({top:window.scrollY+top-12,behavior:"instant"});
 }
-
-function showTestResult(){
-  const pass=test.ok>=17, wrong=test.log.filter(l=>!l.ok).map(l=>byId[l.id]);
-  cur=null;
-  $("card").innerHTML=`<div class="empty"><p class="result" style="color:var(${pass?"--ok":"--bad"})">${test.ok} / 33</p>
-    <p>${pass?"Aprobado":"No aprobado"} · mínimo 17 correctas</p>
-    ${wrong.length?`<div class="tblwrap" style="width:100%;text-align:left"><table><thead><tr><th>Nr.</th><th>Falladas</th></tr></thead><tbody>${wrong.map(q=>`<tr><td class="num">${esc(label(q))}</td><td>${esc(q.q)}<br><span class="hint">✔ ${esc(q.a[q.c])}</span></td></tr>`).join("")}</tbody></table></div>`:""}
-    <div class="row" style="justify-content:center"><button class="btn" id="again">Otro simulacro</button><button class="btn ghost" id="back">Volver a Práctica</button></div></div>`;
-  test=null; animateCard();
-  $("again").onclick=()=>setMode("test"); $("back").onclick=()=>setMode("learn");
-}
-
 function setMode(m){
   mode=m; test=null;
   ["learn","errors","test"].forEach(k=>$("tab-"+k).setAttribute("aria-pressed",String(k===m)));
   if(m==="test"){
     const g=Q.filter(q=>!q.land), b=Q.filter(q=>q.land);
-    const chosen=[...sample(g,30),...sample(b,3)];
+    const chosen=[...shuffled(g.length).slice(0,30).map(i=>g[i]),...shuffled(b.length).slice(0,3).map(i=>b[i])];
     test={ids:shuffled(33).map(i=>chosen[i].id),i:0,ok:0,log:[]};
-    cur=byId[test.ids[0]];
-  } else cur=pick(pool(m));
-  renderQuestion();
-}
-
-function renderAll(keepCur){
-  $("opt-shuffle").checked=state.settings.shuffle; $("opt-en").checked=state.settings.en;
-  renderStats();
-  if(keepCur&&cur) return;
-  if(!test) cur=pick(pool(mode));
-  renderQuestion();
+    showQuestion(byId[test.ids[0]]);
+  } else nextQuestion();
 }
 
 /* ---------- events ---------- */
 $("tab-learn").onclick=()=>setMode("learn");
 $("tab-errors").onclick=()=>setMode("errors");
 $("tab-test").onclick=()=>setMode("test");
-$("opt-shuffle").onchange=e=>{state.settings.shuffle=e.target.checked; saveLocal(); if(!answered) renderQuestion()};
-$("opt-en").onchange=e=>{state.settings.en=e.target.checked; saveLocal(); if(!answered) renderQuestion()};
-function askReset(){
-  $("reset-area").innerHTML=`<span>¿Borrar tus 310 preguntas y todos tus errores? No se puede deshacer.</span><button class="btn danger" id="reset-yes">Sí, borrar</button><button class="btn ghost" id="reset-no">Cancelar</button>`;
-  $("reset-no").onclick=restoreReset;
-  $("reset-yes").onclick=()=>{const s=state.settings; state=blank(); state.settings=s; state.updatedAt=Date.now(); session={ok:0,n:0,streak:0,start:Date.now()}; recent=[]; persist(); restoreReset(); setMode("learn"); renderStats()};
-}
-function restoreReset(){$("reset-area").innerHTML=`<button class="btn danger" id="reset">Borrar todo mi progreso</button>`; $("reset").onclick=askReset}
-$("reset").onclick=askReset;
-document.addEventListener("keydown",e=>{
-  if(e.target.tagName==="INPUT"||e.metaKey||e.ctrlKey||e.altKey) return;
-  if(!answered&&cur&&/^[1-4]$/.test(e.key)){const b=$("ans-"+(+e.key-1)); if(b) b.click()}
-  else if(answered&&e.key==="Enter"&&$("next")){e.preventDefault(); $("next").click()}
-});
-
+$("mode").onclick=()=>{state.settings.mode=state.settings.mode==="dark"?"light":"dark"; saveLocal(); applyChrome()};
+document.querySelectorAll("#langs button").forEach(b=>b.onclick=()=>{state.settings.lang=b.dataset.lang; saveLocal(); applyChrome(); renderStats(); render()});
+$("opt-shuffle").onchange=e=>{state.settings.shuffle=e.target.checked; saveLocal()};
+$("opt-en").onchange=e=>{state.settings.en=e.target.checked; saveLocal(); render()};
 $("exp").onclick=()=>{
-  const blob=new Blob([JSON.stringify(state)],{type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
-  a.download="einbuergerungstest-progreso-"+new Date().toISOString().slice(0,10)+".json"; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),2000); toast("Progreso exportado");
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify(state)],{type:"application/json"}));
+  a.download="einbuergerungstest-progress-"+new Date().toISOString().slice(0,10)+".json"; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000); toast(t("exported"));
 };
 $("imp").onchange=async e=>{
   const f=e.target.files[0]; if(!f) return;
-  try{const s=JSON.parse(await f.text()); if(!s||typeof s.q!=="object") throw 0;
-    state=s; ensureSettings(); saveLocal(); session={ok:0,n:0,streak:0,start:Date.now()}; renderAll(false); toast("Progreso importado")}
-  catch(err){toast("Archivo no válido")}
+  try{const s=JSON.parse(await f.text()); if(!s||typeof s.q!=="object") throw 0; state=s; ensureSettings(); saveLocal(); applyChrome(); renderStats(); setMode(mode); toast(t("imported"))}
+  catch(err){toast(t("badFile"))}
   e.target.value="";
 };
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT"||e.metaKey||e.ctrlKey||e.altKey) return;
+  if(view==="q"&&picked===null&&/^[1-4]$/.test(e.key)){const b=$("ans-"+(+e.key-1)); if(b) b.click()}
+  else if(view==="q"&&picked!==null&&e.key==="Enter"&&$("next")){e.preventDefault(); $("next").click()}
+});
 
 /* ---------- boot ---------- */
 async function start(){
-  state=loadLocal()||blank(); ensureSettings();
-  try{Q=JSON.parse(document.getElementById("qdata").textContent)}
-  catch(e){$("card").innerHTML=`<div class="empty"><p>No se pudieron cargar las preguntas. Recargá la página.</p></div>`;return}
+  state=loadLocal()||blank(); ensureSettings(); applyChrome();
+  try{
+    const inline=document.getElementById("qdata");
+    Q=inline?JSON.parse(inline.textContent):await (await fetch("data.json")).json();
+  }catch(e){$("card").innerHTML=`<div class="empty"><p class="hint">Error: data</p></div>`;return}
   Q.forEach(q=>byId[q.id]=q);
-  setSync("Guardado en este navegador");
-  let canStore=false;
-  try{localStorage.setItem("ebt-probe","1"); canStore=localStorage.getItem("ebt-probe")==="1"; localStorage.removeItem("ebt-probe")}catch(e){}
-  if(!canStore||location.protocol==="content:") setSync("No se puede guardar el progreso: Chrome no guarda datos de archivos abiertos desde el celular. Abrí la app desde su link web, o usá Ajustes → Exportar progreso al terminar.");
-  renderAll(false);
+  if(!IN_CLAUDE){
+    let ok=false; try{localStorage.setItem("ebt-probe","1"); ok=localStorage.getItem("ebt-probe")==="1"; localStorage.removeItem("ebt-probe")}catch(e){}
+    if(!ok||location.protocol==="content:") setWarn("noStore");
+  }
+  renderStats(); nextQuestion();
   connectDb();
 }
 start();
