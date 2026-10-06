@@ -169,6 +169,7 @@ let docRef=null, saveTimer=null;
 /* ---------- pure logic ---------- */
 function blank(){return {v:1,updatedAt:0,q:{},settings:{shuffle:true,en:false}}}
 function rec(id){return state.q[id]||(state.q[id]={need:NEED0,ok:0,bad:0})}
+function today(){const d=new Date().toLocaleDateString("sv"); if(!state.day||state.day.d!==d) state.day={d,ok:0,n:0}; return state.day}
 function needOf(id){const r=state.q[id];return r?r.need:NEED0}
 function applyAnswer(id,correct){
   const r=rec(id);
@@ -224,7 +225,7 @@ function renderStats(){
   for(const q of Q){if(needOf(q.id)===0) done++}
   const pct=Q.length?done/Q.length:0;
   $("s-done").textContent=done;
-  $("s-session").textContent=session.ok+"/"+session.n;
+  {const t=today(); $("s-session").textContent=t.ok+"/"+t.n}
   $("ringpct").textContent=Math.round(pct*100)+"%";
   $("ringval").style.strokeDashoffset=(213.6*(1-pct)).toFixed(1);
   $("cnt-learn").textContent=pool("learn").length;
@@ -260,7 +261,7 @@ function renderQuestion(){
 function answer(ai){
   if(answered||!cur) return; answered=true;
   const q=cur, ok=ai===q.c;
-  applyAnswer(q.id,ok); session.n++; if(ok){session.ok++; session.streak++} else session.streak=0;
+  applyAnswer(q.id,ok); {const t=today(); t.n++; if(ok) t.ok++} session.n++; if(ok){session.ok++; session.streak++} else session.streak=0;
   if(test){test.ok+=ok?1:0; test.log.push({id:q.id,ok})}
   recent.push(q.id); if(recent.length>20) recent.shift();
   document.querySelectorAll(".ans").forEach(b=>{b.disabled=true;const x=+b.dataset.ai; if(x===q.c) b.classList.add("right"); else if(x===ai) b.classList.add("wrong"); else b.classList.add("dim")});
