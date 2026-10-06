@@ -1,28 +1,20 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#24594f"><meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="Einbürgerung">
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#eef5ff"><meta name="mobile-web-app-capable" content="yes"><meta name="application-name" content="Einbürgerung">
 <title>Einbürgerungstest Trainer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap">
 <style>
 /* Layout: calm single reading column; compact progress ring + one-line status above, one roomy question sheet below. Pine ink on cool sage paper, soft coral only for errors. */
 :root{
-  --bg:#e9eeeb; --bg-2:#dfe6e2; --surface:#fbfcfb; --surface-2:#eef3f0; --fg:#18231f; --muted:#5d6b65; --line:#d3ddd8;
-  --accent:#24594f; --accent-soft:#d9e8e3; --accent-fg:#ffffff;
-  --ok:#2c7a54; --ok-bg:#e1f1e8; --bad:#b4483c; --bad-bg:#f8e5e1; --warn:#8b6418; --warn-bg:#f6ecd5;
-  --shadow:0 1px 2px rgba(24,35,31,.05),0 8px 28px rgba(24,35,31,.07);
-  --ui:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --read:"Source Serif 4",Georgia,"Times New Roman",serif;
+  /* Cheerful, always-light: airy sky ground, white sheets, bright cobalt accent, sunflower for "to do", fresh green / coral for right / wrong */
+  --bg:#eef5ff; --bg-2:#dde9fb; --surface:#ffffff; --surface-2:#f1f6fe; --fg:#1b2440; --muted:#5f6b85; --line:#d9e3f3;
+  --accent:#2f62f0; --accent-soft:#e3ebff; --accent-fg:#ffffff;
+  --ok:#14a05c; --ok-bg:#e2f7ec; --bad:#ec4c42; --bad-bg:#ffe9e6; --warn:#e89a00; --warn-bg:#fff3d1;
+  --shadow:0 1px 2px rgba(47,98,240,.06),0 10px 30px rgba(47,98,240,.10);
+  --ui:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --read:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#111816; --bg-2:#0c1210; --surface:#18211e; --surface-2:#1f2a26; --fg:#e4ece8; --muted:#97a69f; --line:#2b3833;
-  --accent:#86c4b3; --accent-soft:#213a33; --accent-fg:#0d1513;
-  --ok:#6fcf9b; --ok-bg:#183126; --bad:#f09486; --bad-bg:#3a201c; --warn:#e3bc68; --warn-bg:#342a14;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.25); color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#111816; --bg-2:#0c1210; --surface:#18211e; --surface-2:#1f2a26; --fg:#e4ece8; --muted:#97a69f; --line:#2b3833;
-  --accent:#86c4b3; --accent-soft:#213a33; --accent-fg:#0d1513;
-  --ok:#6fcf9b; --ok-bg:#183126; --bad:#f09486; --bad-bg:#3a201c; --warn:#e3bc68; --warn-bg:#342a14;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.25); color-scheme:dark}
 *{box-sizing:border-box}
 html{color-scheme:light}
 img{max-width:100%}
@@ -111,13 +103,32 @@ td.num{white-space:nowrap;text-align:right}
   .row .hint.kbd{display:none}
 }
 @media (prefers-reduced-motion:reduce){.card.enter,.feedback{animation:none}.ring .val,.ans,.tab{transition:none}}
+
+/* cheerful accents */
+body{background:radial-gradient(1200px 500px at 85% -10%,#fff2c9 0%,transparent 60%),radial-gradient(900px 500px at -10% 0%,#dff7ec 0%,transparent 55%),var(--bg);background-attachment:fixed}
+.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);box-shadow:0 2px 8px rgba(47,98,240,.3)}
+.ring .val{stroke:url(#ringgrad)}
+.ring .track{stroke:#dde6f6}
+.qtext{font-weight:800;letter-spacing:-.01em}
+h1{font-weight:800}
+.ans{border-radius:14px}
+.ans .k{background:var(--accent-soft);color:var(--accent);border-radius:9px}
+.ans:hover:not(:disabled){background:var(--accent-soft)}
+.dots i{background:var(--warn);box-shadow:none}
+.chip{background:var(--accent-soft);color:var(--accent)}
+.chip.land{background:#fff3d1;color:#9a6400}
+.btn{border-radius:12px;box-shadow:0 3px 10px rgba(47,98,240,.25)}
+.btn.ghost,.btn.danger{box-shadow:none}
+.feedback{border-radius:14px}
+.feedback .ex{font-family:var(--ui)}
+.tabs{background:#ffffffaa}
 </style>
 
 </head><body>
 <div class="wrap">
   <div class="top">
     <div class="ring" aria-label="Preguntas dominadas">
-      <svg viewBox="0 0 80 80" aria-hidden="true"><circle class="track" cx="40" cy="40" r="34"/><circle class="val" id="ringval" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
+      <svg viewBox="0 0 80 80" aria-hidden="true"><defs><linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f62f0"/><stop offset="1" stop-color="#14a05c"/></linearGradient></defs><circle class="track" cx="40" cy="40" r="34"/><circle class="val" id="ringval" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
       <b id="ringpct">0%</b>
     </div>
     <div class="ttl">
